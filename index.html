@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Festa de 15 anos da Isadora</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #ffe6f0;
+      color: #333;
+      text-align: center;
+      padding: 2rem;
+    }
+    .container {
+      background: #fff0f5;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #d63384;
+    }
+    .info {
+      font-size: 1.2rem;
+      margin: 1rem 0;
+    }
+    form {
+      margin-top: 2rem;
+    }
+    input, button {
+      padding: 0.7rem;
+      margin: 0.5rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      width: 80%;
+    }
+    input {
+      text-align: center;
+    }
+    button {
+      background-color: #d63384;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #bf2c76;
+    }
+    .resultado {
+      margin-top: 1.5rem;
+      font-weight: bold;
+      color: #d63384;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .resultado.mostrar {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎀 Festa de 15 anos da Isadora 🎀</h1>
+    <div class="info">
+      <p>Você está convidado para celebrar esse momento especial!</p>
+      <p><strong>Data:</strong> 22 de junho de 2025</p>
+      <p><strong>Local:</strong> Itabirito - MG</p>
+    </div>
+
+    <h2>Confirme sua presença</h2>
+    <form id="form-presenca">
+      <input type="text" id="nome" placeholder="Nome do convidado" required autofocus />
+      <button type="submit">Confirmar presença</button>
+    </form>
+    <div class="resultado" id="resultado"></div>
+  </div>
+
+  <script>
+    const convidados = {
+      "ana paula lima": { qtd: 5, confirmado: false },
+      "rodrigo martins": { qtd: 3, confirmado: false },
+      "fernanda castro": { qtd: 4, confirmado: false },
+      "guilherme": { qtd: 3, confirmado: false },
+      "esther": { qtd: 2, confirmado: false }
+    };
+
+    const form = document.getElementById("form-presenca");
+    const inputNome = document.getElementById("nome");
+    const resultado = document.getElementById("resultado");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      verificarConvidado();
+    });
+
+    inputNome.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        form.querySelector("button[type='submit']").click();
+      }
+    });
+
+    function verificarConvidado() {
+      const nomeDigitado = inputNome.value.trim().toLowerCase();
+      const convidado = convidados[nomeDigitado];
+
+      if (convidado) {
+        const mensagem = convidado.confirmado
+          ? `Olá, ${inputNome.value.trim()}! Você já confirmou presença anteriormente. 🎉`
+          : `Olá, ${inputNome.value.trim()}! Sua presença está confirmada. Você pode levar até ${convidado.qtd} pessoa(s). 🎉`;
+
+        resultado.innerHTML = `
+          ${mensagem}
+          <br><br>
+          <strong>📅 Data:</strong> 22 de junho de 2025<br>
+          <strong>📍 Local:</strong> Itabirito - MG<br><br>
+          <button id="btn-voltar" style="margin-top: 1rem;">Voltar</button>
+        `;
+        resultado.classList.add("mostrar");
+        form.style.display = "none";
+
+        if (!convidado.confirmado) {
+          convidados[nomeDigitado].confirmado = true;
+
+          fetch("https://formspree.io/f/xyzeapbw", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              _subject: `Confirmação de presença - ${inputNome.value.trim()}`,
+              nome: inputNome.value.trim(),
+              convidados: convidado.qtd
+            })
+          });
+        }
+
+        setTimeout(() => {
+          document.getElementById("btn-voltar").focus();
+        }, 100);
+      } else {
+        resultado.innerHTML = `
+          Nome não encontrado na lista de convidados.
+          <br><br>
+          <button id="btn-voltar" style="margin-top: 1rem;">Voltar</button>
+        `;
+        resultado.classList.add("mostrar");
+        form.style.display = "none";
+        setTimeout(() => {
+          document.getElementById("btn-voltar").focus();
+        }, 100);
+      }
+
+      document.addEventListener("keydown", handleVoltarEnter);
+    }
+
+    function voltarFormulario() {
+      form.style.display = "block";
+      resultado.classList.remove("mostrar");
+      resultado.innerHTML = "";
+      inputNome.value = "";
+      inputNome.focus();
+      document.removeEventListener("keydown", handleVoltarEnter);
+    }
+
+    function handleVoltarEnter(e) {
+      if (e.key === "Enter") {
+        const btn = document.getElementById("btn-voltar");
+        if (btn) btn.click();
+      }
+    }
+
+    document.addEventListener("click", function(e) {
+      if (e.target && e.target.id === "btn-voltar") {
+        voltarFormulario();
+      }
+    });
+  </script>
+</body>
+</html>

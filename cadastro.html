@@ -65,7 +65,6 @@
     .acoes {
       display: flex;
       gap: 0.3rem;
-      align-items: center;
     }
     .acoes button {
       background: none;
@@ -78,14 +77,6 @@
     }
     .acoes button:hover {
       opacity: 0.7;
-    }
-    .check {
-      color: green;
-      font-size: 1.5rem;
-      visibility: hidden;
-    }
-    .confirmado .check {
-      visibility: visible;
     }
   </style>
 </head>
@@ -102,70 +93,28 @@
 
   <script>
     let convidados = JSON.parse(localStorage.getItem('convidados')) || {};
+    let confirmados = JSON.parse(localStorage.getItem('confirmados')) || {};
 
     function atualizarLista() {
       const lista = document.getElementById('lista-convidados');
       lista.innerHTML = '';
       for (let nome in convidados) {
         const div = document.createElement('div');
-        div.className = 'lista-item ' + (convidados[nome].confirmado ? 'confirmado' : '');
+        const presençaConfirmada = confirmados[nome] ? '✔️' : ''; // Se confirmado, exibe check verde
+        div.className = 'lista-item';
         div.innerHTML = `
-          <span class="nome">${nome} - ${convidados[nome].quantidade} pessoa(s)</span>
+          <span class="nome">${nome} - ${convidados[nome]} pessoa(s) ${presençaConfirmada}</span>
           <span class="acoes">
             <button onclick="editar('${nome}')" title="Editar">✏️</button>
             <button onclick="excluir('${nome}')" class="excluir" title="Excluir">❌</button>
-            <button onclick="confirmarPresenca('${nome}')" title="Confirmar presença">✔️</button>
           </span>
-          <span class="check">✔️</span>
         `;
         lista.appendChild(div);
       }
     }
 
-    document.getElementById("form-cadastro").addEventListener("submit", function(event) {
-      event.preventDefault();
-      const nome = document.getElementById("nome").value.trim();
-      const quantidade = parseInt(document.getElementById("quantidade").value);
-      if (nome && quantidade >= 0) {
-        convidados[nome] = { quantidade: quantidade, confirmado: false };
-        localStorage.setItem('convidados', JSON.stringify(convidados));
-        document.getElementById("form-cadastro").reset();
-        document.getElementById("nome").focus();
-        atualizarLista();
-      }
-    });
-
-    function excluir(nome) {
-      delete convidados[nome];
-      localStorage.setItem('convidados', JSON.stringify(convidados));
-      atualizarLista();
-    }
-
-    function editar(nome) {
-      const novaQtd = prompt(`Editar quantidade de pessoas para ${nome}:`, convidados[nome].quantidade);
-      if (novaQtd !== null && !isNaN(novaQtd) && parseInt(novaQtd) >= 0) {
-        convidados[nome].quantidade = parseInt(novaQtd);
-        localStorage.setItem('convidados', JSON.stringify(convidados));
-        atualizarLista();
-      }
-    }
-
-    function confirmarPresenca(nome) {
-      convidados[nome].confirmado = true;
-      localStorage.setItem('convidados', JSON.stringify(convidados));
-      atualizarLista();
-    }
-
-    atualizarLista();
-
-    document.getElementById("nome").focus();
-
-    document.addEventListener('keydown', function(event) {
-      if (event.key === "Enter" && document.activeElement.tagName === "BUTTON") {
-        event.preventDefault();
-        document.activeElement.click();
-      }
-    });
+    // Exibir os convidados cadastrados
+    document.addEventListener('DOMContentLoaded', atualizarLista);
   </script>
 </body>
 </html>

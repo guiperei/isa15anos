@@ -59,6 +59,14 @@
     .resultado.mostrar {
       opacity: 1;
     }
+    .link-cadastro {
+      margin-top: 2rem;
+    }
+    .link-cadastro a {
+      color: #d63384;
+      text-decoration: none;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -76,6 +84,10 @@
       <button type="submit">Confirmar presença</button>
     </form>
     <div class="resultado" id="resultado"></div>
+
+    <div class="link-cadastro">
+      <a href="cadastro_real.html">➕ Cadastrar Convidados</a>
+    </div>
   </div>
 
   <script>
@@ -109,7 +121,10 @@
         localStorage.setItem('convidadosConfirmados', JSON.stringify(convidadosConfirmados));
         resultado.innerHTML = `
           Olá, ${nome}! Sua presença está confirmada. Você pode levar até ${convidados[nome]} pessoa(s). 🎉<br>
-          <button id="voltar-btn" onclick="voltarFormulario()" style="margin-top: 1rem;">Voltar</button>
+          <strong>Dados do Evento:</strong><br>
+          <strong>Data:</strong> 22 de junho de 2025<br>
+          <strong>Local:</strong> Itabirito - MG<br>
+          <br><button id="voltar-btn" onclick="voltarFormulario()" style="margin-top: 1rem;">Voltar</button>
         `;
         resultado.classList.add('mostrar');
         form.style.display = 'none';
@@ -136,6 +151,7 @@
       document.getElementById('resultado').innerHTML = '';
       document.getElementById('nome').value = '';
       document.querySelector("#form-presenca button[type='submit']").style.display = 'inline-block';
+      document.getElementById('nome').focus();
     }
 
     document.getElementById("nome").addEventListener("keypress", function(event) {

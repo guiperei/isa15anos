@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Festa de 15 anos da Isadora</title>
+  <title>Confirmação de Presença - Festa da Isadora</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      background: #ffe6f0;
+      background: #fff0f5;
       color: #333;
       text-align: center;
       padding: 2rem;
     }
     .container {
-      background: #fff0f5;
+      background: #ffe6f0;
       border-radius: 20px;
       padding: 2rem;
       max-width: 600px;
@@ -22,10 +22,6 @@
     }
     h1 {
       color: #d63384;
-    }
-    .info {
-      font-size: 1.2rem;
-      margin: 1rem 0;
     }
     form {
       margin-top: 2rem;
@@ -49,126 +45,91 @@
     button:hover {
       background-color: #bf2c76;
     }
-    .resultado {
-      margin-top: 1.5rem;
-      font-weight: bold;
-      color: #d63384;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-    }
-    .resultado.mostrar {
-      opacity: 1;
-    }
-    .link-cadastro {
+    .lista {
       margin-top: 2rem;
     }
-    .link-cadastro a {
-      color: #d63384;
-      text-decoration: none;
-      font-weight: bold;
+    .lista-item {
+      margin: 0.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .lista-item span.nome {
+      flex: 1;
+      text-align: left;
+    }
+    .acoes {
+      display: flex;
+      gap: 0.3rem;
+    }
+    .acoes button {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .acoes .excluir {
+      color: red;
+    }
+    .acoes button:hover {
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎀 Festa de 15 anos da Isadora 🎀</h1>
-    <div class="info">
-      <p>Você está convidado para celebrar esse momento especial!</p>
-      <p><strong>Data:</strong> 22 de junho de 2025</p>
-      <p><strong>Local:</strong> Itabirito - MG</p>
-    </div>
-
-    <h2>Confirme sua presença</h2>
-    <form id="form-presenca">
+    <h1>Confirmação de Presença 🎉</h1>
+    <form id="form-cadastro">
       <input type="text" id="nome" placeholder="Nome do convidado" required autofocus>
-      <button type="submit">Confirmar presença</button>
+      <input type="number" id="quantidade" placeholder="Quantidade de acompanhantes" required min="0">
+      <button type="submit">Cadastrar</button>
     </form>
-    <div class="resultado" id="resultado"></div>
-
-    <!-- Link de Cadastro Atualizado para login.html -->
-    <div class="link-cadastro">
-      <a href="login.html">➕ Cadastrar Convidados</a>
-    </div>
+    <div class="lista" id="lista-convidados"></div>
   </div>
 
   <script>
+    // Dados de convidados
     let convidados = JSON.parse(localStorage.getItem('convidados')) || {};
-    let convidadosConfirmados = JSON.parse(localStorage.getItem('convidadosConfirmados')) || [];
 
-    document.getElementById("form-presenca").addEventListener("submit", function(event) {
-      event.preventDefault();
-      verificarConvidado();
-    });
+    // Função de confirmação de presença
+    function confirmarPresenca(nome) {
+      const quantidade = convidados[nome]; // Obtém a quantidade de acompanhantes do convidado
+      const convidadosConfirmados = JSON.parse(localStorage.getItem('confirmados')) || {};
 
-    function verificarConvidado() {
-      const nome = document.getElementById('nome').value.trim();
-      const resultado = document.getElementById('resultado');
-      const form = document.getElementById('form-presenca');
-      const confirmarButton = document.querySelector("#form-presenca button[type='submit']");
+      if (!convidadosConfirmados[nome]) {
+        // Se ainda não foi confirmado, marca como confirmado
+        convidadosConfirmados[nome] = true;
+        localStorage.setItem('confirmados', JSON.stringify(convidadosConfirmados));
 
-      if (convidadosConfirmados.includes(nome)) {
-        resultado.innerHTML = `
-          Olá, ${nome}! Sua presença já foi confirmada. 🎉<br>
-          <strong>Dados do Evento:</strong><br>
-          <strong>Data:</strong> 22 de junho de 2025<br>
-          <strong>Local:</strong> Itabirito - MG<br>
-          <br><button id="voltar-btn" onclick="voltarFormulario()" style="margin-top: 1rem;">Voltar</button>
-        `;
-        resultado.classList.add('mostrar');
-        form.style.display = 'none';
-        confirmarButton.style.display = 'none';
-      } else if (convidados[nome] !== undefined) {
-        convidadosConfirmados.push(nome);
-        localStorage.setItem('convidadosConfirmados', JSON.stringify(convidadosConfirmados));
-        resultado.innerHTML = `
-          Olá, ${nome}! Sua presença está confirmada. Você pode levar até ${convidados[nome]} pessoa(s). 🎉<br>
-          <strong>Dados do Evento:</strong><br>
-          <strong>Data:</strong> 22 de junho de 2025<br>
-          <strong>Local:</strong> Itabirito - MG<br>
-          <br><button id="voltar-btn" onclick="voltarFormulario()" style="margin-top: 1rem;">Voltar</button>
-        `;
-        resultado.classList.add('mostrar');
-        form.style.display = 'none';
-        confirmarButton.style.display = 'none';
-
-        fetch("https://formspree.io/f/xyzeapbw", {
-          method: "POST",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome: nome, convidados: convidados[nome] })
-        }).then(response => console.log("Enviado para Formspree"));
+        // Mostrar mensagem de sucesso
+        alert(`Obrigado, ${nome}! Você confirmou sua presença com ${quantidade} acompanhante(s).`);
       } else {
-        resultado.innerHTML = `
-          Nome não encontrado na lista de convidados.<br>
-          <button id="voltar-btn" onclick="voltarFormulario()" style="margin-top: 1rem;">Voltar</button>
+        alert(`${nome}, você já confirmou sua presença.`);
+      }
+    }
+
+    // Atualizar lista de convidados
+    function atualizarLista() {
+      const lista = document.getElementById('lista-convidados');
+      lista.innerHTML = '';
+      for (let nome in convidados) {
+        const div = document.createElement('div');
+        const confirmado = JSON.parse(localStorage.getItem('confirmados')) || {};
+        const presençaConfirmada = confirmado[nome] ? '✔️' : '❌'; // Exibe check verde se confirmado
+        div.className = 'lista-item';
+        div.innerHTML = `
+          <span class="nome">${nome} - ${convidados[nome]} pessoa(s) - ${presençaConfirmada}</span>
+          <button onclick="confirmarPresenca('${nome}')">Confirmar Presença</button>
         `;
-        resultado.classList.add('mostrar');
-        confirmarButton.style.display = 'none';
+        lista.appendChild(div);
       }
     }
 
-    function voltarFormulario() {
-      document.getElementById('form-presenca').style.display = 'block';
-      document.getElementById('resultado').classList.remove('mostrar');
-      document.getElementById('resultado').innerHTML = '';
-      document.getElementById('nome').value = '';
-      document.querySelector("#form-presenca button[type='submit']").style.display = 'inline-block';
-      document.getElementById('nome').focus();
-    }
-
-    document.getElementById("nome").addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        document.querySelector("#form-presenca button[type='submit']").click();
-      }
-    });
-
-    document.body.addEventListener('keydown', function(event) {
-      const voltarButton = document.querySelector("#voltar-btn");
-      if (event.key === 'Enter' && voltarButton && voltarButton === document.activeElement) {
-        event.preventDefault();
-        voltarFormulario();
-      }
-    });
+    atualizarLista();
   </script>
 </body>
 </html>

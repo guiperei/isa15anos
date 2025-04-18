@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Festa de 15 anos da Isadora</title>
   <style>
     body {
@@ -72,107 +72,83 @@
 
     <h2>Confirme sua presença</h2>
     <form id="form-presenca">
-      <input type="text" id="nome" placeholder="Nome do convidado" required autofocus />
+      <input type="text" id="nome" placeholder="Nome do convidado" required autofocus>
       <button type="submit">Confirmar presença</button>
     </form>
     <div class="resultado" id="resultado"></div>
   </div>
 
   <script>
-    const convidados = {
-      "ana paula lima": { qtd: 5, confirmado: false },
-      "rodrigo martins": { qtd: 3, confirmado: false },
-      "fernanda castro": { qtd: 4, confirmado: false },
-      "guilherme": { qtd: 3, confirmado: false },
-      "esther": { qtd: 2, confirmado: false }
-    };
+    let convidados = JSON.parse(localStorage.getItem('convidados')) || {};
+    let convidadosConfirmados = JSON.parse(localStorage.getItem('convidadosConfirmados')) || [];
 
-    const form = document.getElementById("form-presenca");
-    const inputNome = document.getElementById("nome");
-    const resultado = document.getElementById("resultado");
-
-    form.addEventListener("submit", function(event) {
+    document.getElementById("form-presenca").addEventListener("submit", function(event) {
       event.preventDefault();
       verificarConvidado();
     });
 
-    inputNome.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        form.querySelector("button[type='submit']").click();
-      }
-    });
-
     function verificarConvidado() {
-      const nomeDigitado = inputNome.value.trim().toLowerCase();
-      const convidado = convidados[nomeDigitado];
+      const nome = document.getElementById('nome').value.trim();
+      const resultado = document.getElementById('resultado');
+      const form = document.getElementById('form-presenca');
+      const confirmarButton = document.querySelector("#form-presenca button[type='submit']");
 
-      if (convidado) {
-        const mensagem = convidado.confirmado
-          ? `Olá, ${inputNome.value.trim()}! Você já confirmou presença anteriormente. 🎉`
-          : `Olá, ${inputNome.value.trim()}! Sua presença está confirmada. Você pode levar até ${convidado.qtd} pessoa(s). 🎉`;
-
+      if (convidadosConfirmados.includes(nome)) {
         resultado.innerHTML = `
-          ${mensagem}
-          <br><br>
-          <strong>📅 Data:</strong> 22 de junho de 2025<br>
-          <strong>📍 Local:</strong> Itabirito - MG<br><br>
-          <button id="btn-voltar" style="margin-top: 1rem;">Voltar</button>
+          Olá, ${nome}! Sua presença já foi confirmada. 🎉<br>
+          <strong>Dados do Evento:</strong><br>
+          <strong>Data:</strong> 22 de junho de 2025<br>
+          <strong>Local:</strong> Itabirito - MG<br>
+          <br><button id="voltar-btn" onclick="voltarFormulario()" style="margin-top: 1rem;">Voltar</button>
         `;
-        resultado.classList.add("mostrar");
-        form.style.display = "none";
+        resultado.classList.add('mostrar');
+        form.style.display = 'none';
+        confirmarButton.style.display = 'none';
+      } else if (convidados[nome] !== undefined) {
+        convidadosConfirmados.push(nome);
+        localStorage.setItem('convidadosConfirmados', JSON.stringify(convidadosConfirmados));
+        resultado.innerHTML = `
+          Olá, ${nome}! Sua presença está confirmada. Você pode levar até ${convidados[nome]} pessoa(s). 🎉<br>
+          <button id="voltar-btn" onclick="voltarFormulario()" style="margin-top: 1rem;">Voltar</button>
+        `;
+        resultado.classList.add('mostrar');
+        form.style.display = 'none';
+        confirmarButton.style.display = 'none';
 
-        if (!convidado.confirmado) {
-          convidados[nomeDigitado].confirmado = true;
-
-          fetch("https://formspree.io/f/xyzeapbw", {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              _subject: `Confirmação de presença - ${inputNome.value.trim()}`,
-              nome: inputNome.value.trim(),
-              convidados: convidado.qtd
-            })
-          });
-        }
-
-        setTimeout(() => {
-          document.getElementById("btn-voltar").focus();
-        }, 100);
+        fetch("https://formspree.io/f/xyzeapbw", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome: nome, convidados: convidados[nome] })
+        }).then(response => console.log("Enviado para Formspree"));
       } else {
         resultado.innerHTML = `
-          Nome não encontrado na lista de convidados.
-          <br><br>
-          <button id="btn-voltar" style="margin-top: 1rem;">Voltar</button>
+          Nome não encontrado na lista de convidados.<br>
+          <button id="voltar-btn" onclick="voltarFormulario()" style="margin-top: 1rem;">Voltar</button>
         `;
-        resultado.classList.add("mostrar");
-        form.style.display = "none";
-        setTimeout(() => {
-          document.getElementById("btn-voltar").focus();
-        }, 100);
+        resultado.classList.add('mostrar');
+        confirmarButton.style.display = 'none';
       }
-
-      document.addEventListener("keydown", handleVoltarEnter);
     }
 
     function voltarFormulario() {
-      form.style.display = "block";
-      resultado.classList.remove("mostrar");
-      resultado.innerHTML = "";
-      inputNome.value = "";
-      inputNome.focus();
-      document.removeEventListener("keydown", handleVoltarEnter);
+      document.getElementById('form-presenca').style.display = 'block';
+      document.getElementById('resultado').classList.remove('mostrar');
+      document.getElementById('resultado').innerHTML = '';
+      document.getElementById('nome').value = '';
+      document.querySelector("#form-presenca button[type='submit']").style.display = 'inline-block';
     }
 
-    function handleVoltarEnter(e) {
-      if (e.key === "Enter") {
-        const btn = document.getElementById("btn-voltar");
-        if (btn) btn.click();
+    document.getElementById("nome").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        document.querySelector("#form-presenca button[type='submit']").click();
       }
-    }
+    });
 
-    document.addEventListener("click", function(e) {
-      if (e.target && e.target.id === "btn-voltar") {
+    document.body.addEventListener('keydown', function(event) {
+      const voltarButton = document.querySelector("#voltar-btn");
+      if (event.key === 'Enter' && voltarButton && voltarButton === document.activeElement) {
+        event.preventDefault();
         voltarFormulario();
       }
     });

@@ -1,34 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cadastro de Convidados</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Convidados - Festa de 15 anos da Isadora</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #ffe6f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 100vh;
-      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #ffe6f0;
+      color: #333;
+      text-align: center;
+      padding: 2rem;
     }
     .container {
-      background-color: #fff0f5;
-      padding: 2rem;
+      background: #fff0f5;
       border-radius: 20px;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      text-align: center;
-      max-width: 400px;
+    }
+    h1 {
+      color: #d63384;
+    }
+    .info {
+      font-size: 1.2rem;
+      margin: 1rem 0;
+    }
+    form {
+      margin-top: 2rem;
     }
     input, button {
       padding: 0.7rem;
-      margin: 0.5rem 0;
+      margin: 0.5rem;
       border-radius: 10px;
       border: 1px solid #ccc;
-      width: 100%;
+      width: 80%;
+    }
+    input {
+      text-align: center;
     }
     button {
       background-color: #d63384;
@@ -39,100 +49,57 @@
     button:hover {
       background-color: #bf2c76;
     }
-    ul {
-      padding: 0;
-      list-style: none;
-      margin-top: 1rem;
-      max-height: 200px;
-      overflow-y: auto;
+    .link-voltar {
+      margin-top: 2rem;
     }
-    li {
-      margin: 0.3rem 0;
-      background: #ffe6f0;
-      padding: 0.5rem;
-      border-radius: 10px;
-    }
-    .acoes button {
-      margin-left: 5px;
-      font-size: 0.8rem;
-      padding: 0.3rem 0.5rem;
+    .link-voltar a {
+      color: #d63384;
+      text-decoration: none;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Cadastro de Convidados</h2>
-    <input type="text" id="nome" placeholder="Nome do convidado" autofocus />
-    <input type="number" id="quantidade" placeholder="Qtd. de acompanhantes" />
-    <button onclick="cadastrarConvidado()">Cadastrar</button>
-    <ul id="lista-convidados"></ul>
+    <h1>🎀 Cadastro de Convidados - Festa de 15 anos da Isadora 🎀</h1>
+    <div class="info">
+      <p>Por favor, cadastre os convidados abaixo!</p>
+    </div>
+
+    <h2>Cadastrar Convidado</h2>
+    <form id="form-cadastro">
+      <input type="text" id="nome-convidado" placeholder="Nome do convidado" required autofocus>
+      <input type="number" id="quantidade-convidados" placeholder="Quantidade de convidados" required>
+      <button type="submit">Cadastrar Convidado</button>
+    </form>
+
+    <div class="link-voltar">
+      <a href="index.html">↩️ Voltar para a página de confirmação</a>
+    </div>
   </div>
 
   <script>
-    const nomeInput = document.getElementById("nome");
-    const qtdInput = document.getElementById("quantidade");
-    const lista = document.getElementById("lista-convidados");
+    let convidados = JSON.parse(localStorage.getItem('convidados')) || {};
 
-    let convidados = JSON.parse(localStorage.getItem("convidados")) || {};
-
-    function atualizarLista() {
-      lista.innerHTML = "";
-      for (let nome in convidados) {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          ${nome} - ${convidados[nome]} pessoa(s)
-          <span class="acoes">
-            <button onclick="editar('${nome}')">✏️</button>
-            <button onclick="excluir('${nome}')">❌</button>
-          </span>
-        `;
-        lista.appendChild(li);
-      }
-    }
+    document.getElementById("form-cadastro").addEventListener("submit", function(event) {
+      event.preventDefault();
+      cadastrarConvidado();
+    });
 
     function cadastrarConvidado() {
-      const nome = nomeInput.value.trim();
-      const quantidade = parseInt(qtdInput.value.trim());
-      if (!nome || isNaN(quantidade)) return alert("Preencha todos os campos corretamente");
-
-      convidados[nome] = quantidade;
-      localStorage.setItem("convidados", JSON.stringify(convidados));
-      nomeInput.value = "";
-      qtdInput.value = "";
-      nomeInput.focus();
-      atualizarLista();
-    }
-
-    function excluir(nome) {
-      if (confirm(`Deseja excluir ${nome}?`)) {
-        delete convidados[nome];
-        localStorage.setItem("convidados", JSON.stringify(convidados));
-        atualizarLista();
+      const nomeConvidado = document.getElementById('nome-convidado').value.trim();
+      const quantidadeConvidados = document.getElementById('quantidade-convidados').value.trim();
+      
+      if (nomeConvidado && quantidadeConvidados) {
+        convidados[nomeConvidado] = parseInt(quantidadeConvidados);
+        localStorage.setItem('convidados', JSON.stringify(convidados));
+        
+        alert(`Convidado ${nomeConvidado} cadastrado com sucesso!`);
+        document.getElementById('form-cadastro').reset();
+      } else {
+        alert('Por favor, preencha todos os campos.');
       }
     }
-
-    function editar(nome) {
-      const novaQtd = prompt(`Nova quantidade para ${nome}:`, convidados[nome]);
-      if (novaQtd !== null && !isNaN(parseInt(novaQtd))) {
-        convidados[nome] = parseInt(novaQtd);
-        localStorage.setItem("convidados", JSON.stringify(convidados));
-        atualizarLista();
-      }
-    }
-
-    nomeInput.addEventListener("keypress", function (event) {
-      if (event.key === "Enter") {
-        cadastrarConvidado();
-      }
-    });
-
-    qtdInput.addEventListener("keypress", function (event) {
-      if (event.key === "Enter") {
-        cadastrarConvidado();
-      }
-    });
-
-    atualizarLista();
   </script>
 </body>
 </html>

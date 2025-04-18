@@ -113,6 +113,19 @@
       }
     }
 
+    document.getElementById("form-cadastro").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const nome = document.getElementById("nome").value.trim();
+      const quantidade = parseInt(document.getElementById("quantidade").value);
+      if (nome && quantidade >= 0) {
+        convidados[nome] = quantidade;
+        localStorage.setItem('convidados', JSON.stringify(convidados));
+        document.getElementById("form-cadastro").reset();
+        document.getElementById("nome").focus();
+        atualizarLista();
+      }
+    });
+
     // Exibir os convidados cadastrados
     document.addEventListener('DOMContentLoaded', atualizarLista);
   </script>

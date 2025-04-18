@@ -2,30 +2,39 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Área Restrita</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Convidados - Festa da Isadora</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #ffe6f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #fff0f5;
+      color: #333;
+      text-align: center;
+      padding: 2rem;
     }
     .container {
-      background-color: #fff0f5;
-      padding: 2rem;
+      background: #ffe6f0;
       border-radius: 20px;
-      text-align: center;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #d63384;
+    }
+    form {
+      margin-top: 2rem;
     }
     input, button {
       padding: 0.7rem;
-      margin: 0.5rem 0;
+      margin: 0.5rem;
       border-radius: 10px;
       border: 1px solid #ccc;
-      width: 100%;
+      width: 80%;
+    }
+    input {
+      text-align: center;
     }
     button {
       background-color: #d63384;
@@ -33,32 +42,88 @@
       border: none;
       cursor: pointer;
     }
-    p#erro {
-      color: red;
+    button:hover {
+      background-color: #bf2c76;
+    }
+    .lista {
+      margin-top: 2rem;
+    }
+    .lista-item {
+      margin: 0.5rem 0;
+    }
+    .acoes {
+      margin-left: 1rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Área Restrita</h2>
-    <p>Digite a senha para acessar o cadastro:</p>
-    <input type="password" id="senha" placeholder="Senha" autofocus />
-    <button onclick="verificarSenha()">Entrar</button>
-    <p id="erro"></p>
+    <h1>Cadastro de Convidados 🎉</h1>
+    <form id="form-cadastro">
+      <input type="text" id="nome" placeholder="Nome do convidado" required autofocus>
+      <input type="number" id="quantidade" placeholder="Quantidade de acompanhantes" required min="0">
+      <button type="submit">Cadastrar</button>
+    </form>
+    <div class="lista" id="lista-convidados"></div>
   </div>
 
   <script>
-    function verificarSenha() {
-      const senha = document.getElementById("senha").value;
-      if (senha === "isa15anos") {
-        window.location.href = "cadastro_real.html";
-      } else {
-        document.getElementById("erro").textContent = "Senha incorreta!";
+    let convidados = JSON.parse(localStorage.getItem('convidados')) || {};
+
+    function atualizarLista() {
+      const lista = document.getElementById('lista-convidados');
+      lista.innerHTML = '';
+      for (let nome in convidados) {
+        const div = document.createElement('div');
+        div.className = 'lista-item';
+        div.innerHTML = `
+          ${nome} - ${convidados[nome]} pessoa(s)
+          <span class="acoes">
+            <button onclick="editar('${nome}')">✏️</button>
+            <button onclick="excluir('${nome}')">❌</button>
+          </span>
+        `;
+        lista.appendChild(div);
       }
     }
 
-    document.getElementById("senha").addEventListener("keypress", function(event) {
-      if (event.key === "Enter") verificarSenha();
+    document.getElementById("form-cadastro").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const nome = document.getElementById("nome").value.trim();
+      const quantidade = parseInt(document.getElementById("quantidade").value);
+      if (nome && quantidade >= 0) {
+        convidados[nome] = quantidade;
+        localStorage.setItem('convidados', JSON.stringify(convidados));
+        document.getElementById("form-cadastro").reset();
+        document.getElementById("nome").focus();
+        atualizarLista();
+      }
+    });
+
+    function excluir(nome) {
+      delete convidados[nome];
+      localStorage.setItem('convidados', JSON.stringify(convidados));
+      atualizarLista();
+    }
+
+    function editar(nome) {
+      const novaQtd = prompt(`Editar quantidade de pessoas para ${nome}:`, convidados[nome]);
+      if (novaQtd !== null && !isNaN(novaQtd)) {
+        convidados[nome] = parseInt(novaQtd);
+        localStorage.setItem('convidados', JSON.stringify(convidados));
+        atualizarLista();
+      }
+    }
+
+    atualizarLista();
+
+    document.getElementById("nome").focus();
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === "Enter" && document.activeElement.tagName === "BUTTON") {
+        event.preventDefault();
+        document.activeElement.click();
+      }
     });
   </script>
 </body>

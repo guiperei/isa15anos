@@ -64,13 +64,13 @@
     }
     .acoes {
       display: flex;
-      gap: 0.3rem;
+      gap: 0.5rem;
       align-items: center;
     }
     .acoes button {
       background: none;
       border: none;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       cursor: pointer;
     }
     .acoes .excluir {
@@ -81,6 +81,9 @@
     }
     .acoes button:hover {
       opacity: 0.7;
+    }
+    .check {
+      font-size: 1.5rem;
     }
   </style>
 </head>
@@ -97,21 +100,20 @@
 
   <script>
     let convidados = JSON.parse(localStorage.getItem('convidados')) || {};
-    let confirmados = JSON.parse(localStorage.getItem('confirmados')) || [];
 
     function atualizarLista() {
       const lista = document.getElementById('lista-convidados');
       lista.innerHTML = '';
       for (let nome in convidados) {
-        const confirmado = confirmados.includes(nome);
         const div = document.createElement('div');
         div.className = 'lista-item';
+        const confirmado = convidados[nome].confirmado ? '✅' : '';
         div.innerHTML = `
-          <span class="nome">${nome} - ${convidados[nome]} pessoa(s)</span>
+          <span class="nome">${nome} - ${convidados[nome].quantidade} pessoa(s)</span>
           <span class="acoes">
-            ${confirmado ? '<span class="confirmado" title="Confirmado">✅</span>' : ''}
             <button onclick="editar('${nome}')" title="Editar">✏️</button>
             <button onclick="excluir('${nome}')" class="excluir" title="Excluir">❌</button>
+            <span class="check">${confirmado}</span>
           </span>
         `;
         lista.appendChild(div);
@@ -123,7 +125,7 @@
       const nome = document.getElementById("nome").value.trim();
       const quantidade = parseInt(document.getElementById("quantidade").value);
       if (nome && quantidade >= 0) {
-        convidados[nome] = quantidade;
+        convidados[nome] = { quantidade: quantidade, confirmado: false };
         localStorage.setItem('convidados', JSON.stringify(convidados));
         document.getElementById("form-cadastro").reset();
         document.getElementById("nome").focus();
@@ -133,19 +135,23 @@
 
     function excluir(nome) {
       delete convidados[nome];
-      confirmados = confirmados.filter(n => n !== nome);
       localStorage.setItem('convidados', JSON.stringify(convidados));
-      localStorage.setItem('confirmados', JSON.stringify(confirmados));
       atualizarLista();
     }
 
     function editar(nome) {
-      const novaQtd = prompt(`Editar quantidade de pessoas para ${nome}:`, convidados[nome]);
+      const novaQtd = prompt(`Editar quantidade de pessoas para ${nome}:`, convidados[nome].quantidade);
       if (novaQtd !== null && !isNaN(novaQtd) && parseInt(novaQtd) >= 0) {
-        convidados[nome] = parseInt(novaQtd);
+        convidados[nome].quantidade = parseInt(novaQtd);
         localStorage.setItem('convidados', JSON.stringify(convidados));
         atualizarLista();
       }
+    }
+
+    function confirmar(nome) {
+      convidados[nome].confirmado = true;
+      localStorage.setItem('convidados', JSON.stringify(convidados));
+      atualizarLista();
     }
 
     atualizarLista();

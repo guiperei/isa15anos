@@ -28,21 +28,32 @@
       margin-top: 0.5rem;
       color: #555;
     }
-    .buttons {
-      margin-top: 2rem;
+    input[type="text"] {
+      padding: 0.6rem;
+      width: 80%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 1rem;
     }
-    .buttons button {
+    button {
       background-color: #d63384;
       color: white;
       border: none;
       padding: 0.8rem 1.5rem;
-      margin: 0.5rem;
+      margin-top: 1rem;
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
     }
-    .buttons button:hover {
+    button:hover {
       background-color: #c02574;
+    }
+    #mensagem {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      color: #333;
     }
   </style>
 </head>
@@ -54,10 +65,47 @@
       O evento será no dia <strong>28 de junho de 2025</strong>.<br>
       Por favor, confirme sua presença.
     </p>
-    <div class="buttons">
-      <button onclick="window.location.href='confirmar.html'">Confirmar Presença</button>
-      <button onclick="window.location.href='login.html'">Cadastrar Convidado</button>
-    </div>
+    <input type="text" id="nomeConvidado" placeholder="Digite o nome do convidado" autofocus onkeydown="if(event.key === 'Enter') confirmarPresenca()" />
+    <br>
+    <button onclick="confirmarPresenca()">Confirmar Presença</button>
+    <br>
+    <button onclick="window.location.href='login.html'">Cadastrar Convidado</button>
+    <div id="mensagem"></div>
   </div>
+  
+  <script>
+    async function confirmarPresenca() {
+      const nome = document.getElementById('nomeConvidado').value.trim().toLowerCase();
+      const mensagem = document.getElementById('mensagem');
+      try {
+        const response = await fetch('convidados.json');
+        const convidados = await response.json();
+        const convidado = convidados.find(c => c.nome.toLowerCase() === nome);
+
+        if (!convidado) {
+          mensagem.innerHTML = 'Nome não encontrado na lista de convidados.';
+          return;
+        }
+
+        if (convidado.confirmado) {
+          mensagem.innerHTML = `Você já confirmou sua presença!<br><br>
+            <strong>Data:</strong> 28 de junho de 2025<br>
+            <strong>Local:</strong> Espaço de Festas Jardim Encantado<br>
+            <strong>Horário:</strong> 19h00`;
+        } else {
+          convidado.confirmado = true;
+          mensagem.innerHTML = `Presença confirmada com sucesso!<br><br>
+            <strong>Data:</strong> 28 de junho de 2025<br>
+            <strong>Local:</strong> Espaço de Festas Jardim Encantado<br>
+            <strong>Horário:</strong> 19h00`;
+
+          // Atualiza o JSON se estiver sendo testado com backend local ou futuramente com Firebase, etc.
+          // Aqui só simula a mudança.
+        }
+      } catch (e) {
+        mensagem.innerText = 'Erro ao buscar a lista de convidados.';
+      }
+    }
+  </script>
 </body>
 </html>

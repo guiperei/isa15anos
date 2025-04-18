@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Cadastro de Convidados</title>
+  <title>Festa de 15 anos da Isadora</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       background: #ffe6f0;
       color: #333;
       text-align: center;
@@ -23,12 +23,22 @@
     h1 {
       color: #d63384;
     }
+    .info {
+      font-size: 1.2rem;
+      margin: 1rem 0;
+    }
+    form {
+      margin-top: 2rem;
+    }
     input, button {
       padding: 0.7rem;
       margin: 0.5rem;
       border-radius: 10px;
       border: 1px solid #ccc;
       width: 80%;
+    }
+    input {
+      text-align: center;
     }
     button {
       background-color: #d63384;
@@ -39,35 +49,50 @@
     button:hover {
       background-color: #bf2c76;
     }
+    .resultado {
+      margin-top: 1.5rem;
+      font-weight: bold;
+      color: #d63384;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .resultado.mostrar {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Área Restrita</h1>
-    <p>Por favor, insira a senha para acessar o cadastro de convidados.</p>
-    <form id="login-form">
+    <h1>🎀 Festa de 15 anos da Isadora 🎀</h1>
+    <div class="info">
+      <p>Digite a senha para acessar a área de cadastro de convidados:</p>
+    </div>
+
+    <form id="form-login">
       <input type="password" id="senha" placeholder="Senha" required autofocus>
       <button type="submit">Entrar</button>
     </form>
+    <div class="resultado" id="resultado"></div>
   </div>
 
   <script>
-    const senhaCorreta = "guilherme"; // Defina a senha aqui
+    const senhaCorreta = "guilherme"; // A senha definida no código
+    const formLogin = document.getElementById("form-login");
+    const resultado = document.getElementById("resultado");
 
-    document.getElementById("login-form").addEventListener("submit", function(event) {
+    formLogin.addEventListener("submit", function(event) {
       event.preventDefault();
-      verificarSenha();
-    });
-
-    function verificarSenha() {
-      const senha = document.getElementById('senha').value.trim();
+      const senha = document.getElementById("senha").value.trim();
 
       if (senha === senhaCorreta) {
+        // Se a senha for correta, redireciona para a página de cadastro
         window.location.href = "cadastro.html"; // Redireciona para a página de cadastro
       } else {
-        alert("Senha incorreta! Tente novamente.");
+        // Se a senha for incorreta, exibe mensagem de erro
+        resultado.innerHTML = "Senha incorreta. Tente novamente.";
+        resultado.classList.add("mostrar");
       }
-    }
+    });
   </script>
 </body>
 </html>

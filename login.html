@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Festa de 15 anos da Isadora</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffe6f0;
+      text-align: center;
+      padding: 50px;
+    }
+    .container {
+      background: #fff0f5;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 0.7rem;
+      margin: 0.5rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      width: 80%;
+    }
+    button {
+      background-color: #d63384;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #bf2c76;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Acesso Restrito 🔐</h1>
+    <p>Digite a senha para acessar a página de cadastro de convidados:</p>
+    <input type="password" id="senha" placeholder="Digite a senha" required>
+    <button onclick="verificarSenha()">Acessar Cadastro</button>
+    <p id="erro" style="color: red; display: none;">Senha incorreta! Tente novamente.</p>
+  </div>
+
+  <script>
+    function verificarSenha() {
+      const senha = document.getElementById('senha').value;
+      const erro = document.getElementById('erro');
+
+      const senhaCorreta = '12345'; // Defina a senha aqui (modifique conforme necessário)
+
+      if (senha === senhaCorreta) {
+        window.location.href = 'cadastro.html'; // Se a senha estiver correta, redireciona para a página de cadastro
+      } else {
+        erro.style.display = 'block'; // Mostra a mensagem de erro se a senha estiver incorreta
+      }
+    }
+  </script>
+</body>
+</html>

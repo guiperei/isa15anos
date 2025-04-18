@@ -3,21 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Festa de 15 anos da Isadora</title>
+  <title>Login - Cadastro de Convidados</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #ffe6f0;
+      color: #333;
       text-align: center;
-      padding: 50px;
+      padding: 2rem;
     }
     .container {
       background: #fff0f5;
       border-radius: 20px;
-      padding: 30px;
+      padding: 2rem;
       max-width: 400px;
       margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #d63384;
     }
     input, button {
       padding: 0.7rem;
@@ -39,24 +43,29 @@
 </head>
 <body>
   <div class="container">
-    <h1>🔐 Acesso Restrito 🔐</h1>
-    <p>Digite a senha para acessar a página de cadastro de convidados:</p>
-    <input type="password" id="senha" placeholder="Digite a senha" required>
-    <button onclick="verificarSenha()">Acessar Cadastro</button>
-    <p id="erro" style="color: red; display: none;">Senha incorreta! Tente novamente.</p>
+    <h1>Área Restrita</h1>
+    <p>Por favor, insira a senha para acessar o cadastro de convidados.</p>
+    <form id="login-form">
+      <input type="password" id="senha" placeholder="Senha" required autofocus>
+      <button type="submit">Entrar</button>
+    </form>
   </div>
 
   <script>
-    function verificarSenha() {
-      const senha = document.getElementById('senha').value;
-      const erro = document.getElementById('erro');
+    const senhaCorreta = "senha123"; // Defina a senha aqui
 
-      const senhaCorreta = '12345'; // Defina a senha aqui (modifique conforme necessário)
+    document.getElementById("login-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      verificarSenha();
+    });
+
+    function verificarSenha() {
+      const senha = document.getElementById('senha').value.trim();
 
       if (senha === senhaCorreta) {
-        window.location.href = 'cadastro.html'; // Se a senha estiver correta, redireciona para a página de cadastro
+        window.location.href = "cadastro.html"; // Redireciona para a página de cadastro
       } else {
-        erro.style.display = 'block'; // Mostra a mensagem de erro se a senha estiver incorreta
+        alert("Senha incorreta! Tente novamente.");
       }
     }
   </script>

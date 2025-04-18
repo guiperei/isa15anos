@@ -1,100 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Confirmação de Presença - Festa da Isadora</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background: #fff0f5;
       color: #333;
       text-align: center;
       padding: 2rem;
     }
     .container {
+      max-width: 500px;
+      margin: auto;
       background: #ffe6f0;
       border-radius: 20px;
       padding: 2rem;
-      max-width: 600px;
-      margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     h1 {
       color: #d63384;
     }
-    .lista {
-      margin-top: 2rem;
-    }
-    .lista-item {
+    input, button {
+      padding: 0.7rem;
       margin: 0.5rem 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff;
-      padding: 0.5rem 1rem;
+      width: 80%;
       border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      border: 1px solid #ccc;
     }
-    .lista-item span.nome {
-      flex: 1;
-      text-align: left;
+    input {
+      text-align: center;
     }
-    .acoes {
-      display: flex;
-      gap: 0.3rem;
-    }
-    .acoes button {
-      background: none;
+    button {
+      background-color: #d63384;
+      color: white;
       border: none;
-      font-size: 1.2rem;
       cursor: pointer;
     }
-    .acoes .excluir {
-      color: red;
+    button:hover {
+      background-color: #bf2c76;
     }
-    .acoes button:hover {
-      opacity: 0.7;
+    .mensagem {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: green;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Confirmação de Presença 🎉</h1>
-    <div class="lista" id="lista-convidados"></div>
+    <h1>Confirme sua presença 🎉</h1>
+    <p>Digite seu nome exatamente como foi cadastrado:</p>
+    <input type="text" id="nome" placeholder="Seu nome" autofocus />
+    <button onclick="confirmarPresenca()" id="btn-confirmar">Confirmar Presença</button>
+    <p id="mensagem" class="mensagem"></p>
   </div>
 
   <script>
+    const nomeInput = document.getElementById("nome");
+    const mensagem = document.getElementById("mensagem");
+    const btnConfirmar = document.getElementById("btn-confirmar");
+
     let convidados = JSON.parse(localStorage.getItem('convidados')) || {};
-    let confirmados = JSON.parse(localStorage.getItem('confirmados')) || {};
+    let confirmados = JSON.parse(localStorage.getItem('confirmados')) || [];
 
-    function confirmarPresenca(nome) {
-      if (!confirmados[nome]) {
-        confirmados[nome] = true;
-        localStorage.setItem('confirmados', JSON.stringify(confirmados));
-        alert(`Obrigado, ${nome}! Você confirmou sua presença.`);
+    function confirmarPresenca() {
+      const nome = nomeInput.value.trim();
+      if (!nome) return;
+
+      if (convidados[nome]) {
+        if (!confirmados.includes(nome)) {
+          confirmados.push(nome);
+          localStorage.setItem('confirmados', JSON.stringify(confirmados));
+          mensagem.textContent = `Obrigado, ${nome}! Sua presença foi confirmada.`;
+        } else {
+          mensagem.textContent = `Você já confirmou sua presença, ${nome}.`;
+        }
       } else {
-        alert(`${nome}, você já confirmou sua presença.`);
+        mensagem.textContent = "Nome não encontrado. Verifique se foi digitado corretamente.";
       }
-      atualizarLista();
+
+      nomeInput.value = "";
+      nomeInput.focus();
     }
 
-    function atualizarLista() {
-      const lista = document.getElementById('lista-convidados');
-      lista.innerHTML = '';
-      for (let nome in convidados) {
-        const div = document.createElement('div');
-        const presençaConfirmada = confirmados[nome] ? '✔️' : '❌';
-        div.className = 'lista-item';
-        div.innerHTML = `
-          <span class="nome">${nome} - ${convidados[nome]} pessoa(s) - ${presençaConfirmada}</span>
-          <button onclick="confirmarPresenca('${nome}')">Confirmar Presença</button>
-        `;
-        lista.appendChild(div);
+    nomeInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        confirmarPresenca();
       }
-    }
+    });
 
-    atualizarLista();
+    btnConfirmar.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        confirmarPresenca();
+      }
+    });
   </script>
 </body>
 </html>

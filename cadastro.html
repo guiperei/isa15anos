@@ -126,8 +126,19 @@
       }
     });
 
-    // Exibir os convidados cadastrados
-    document.addEventListener('DOMContentLoaded', atualizarLista);
-  </script>
-</body>
-</html>
+    function excluir(nome) {
+      delete convidados[nome];
+      localStorage.setItem('convidados', JSON.stringify(convidados));
+      atualizarLista();
+    }
+
+    function editar(nome) {
+      const novaQtd = prompt(`Editar quantidade de pessoas para ${nome}:`, convidados[nome]);
+      if (novaQtd !== null && !isNaN(novaQtd) && parseInt(novaQtd) >= 0) {
+        convidados[nome] = parseInt(novaQtd);
+        localStorage.setItem('convidados', JSON.stringify(convidados));
+        atualizarLista();
+      }
+    }
+
+   

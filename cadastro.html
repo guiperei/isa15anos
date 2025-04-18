@@ -50,9 +50,26 @@
     }
     .lista-item {
       margin: 0.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
-    .acoes {
-      margin-left: 1rem;
+    .acoes button {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+    .acoes button:hover {
+      opacity: 0.7;
+    }
+    .acoes .excluir {
+      color: red;
     }
   </style>
 </head>
@@ -77,10 +94,10 @@
         const div = document.createElement('div');
         div.className = 'lista-item';
         div.innerHTML = `
-          ${nome} - ${convidados[nome]} pessoa(s)
+          <span>${nome} - ${convidados[nome]} pessoa(s)</span>
           <span class="acoes">
-            <button onclick="editar('${nome}')">✏️</button>
-            <button onclick="excluir('${nome}')">❌</button>
+            <button onclick="editar('${nome}')" title="Editar">✏️</button>
+            <button onclick="excluir('${nome}')" class="excluir" title="Excluir">❌</button>
           </span>
         `;
         lista.appendChild(div);
@@ -108,7 +125,7 @@
 
     function editar(nome) {
       const novaQtd = prompt(`Editar quantidade de pessoas para ${nome}:`, convidados[nome]);
-      if (novaQtd !== null && !isNaN(novaQtd)) {
+      if (novaQtd !== null && !isNaN(novaQtd) && parseInt(novaQtd) >= 0) {
         convidados[nome] = parseInt(novaQtd);
         localStorage.setItem('convidados', JSON.stringify(convidados));
         atualizarLista();

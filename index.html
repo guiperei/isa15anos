@@ -47,6 +47,19 @@
       font-weight: bold;
       color: green;
     }
+    .info-evento {
+      margin-top: 2rem;
+      font-size: 0.95rem;
+      color: #444;
+    }
+    .link-cadastro {
+      margin-top: 2rem;
+      display: inline-block;
+      font-size: 0.9rem;
+      color: #555;
+      text-decoration: underline;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -56,12 +69,19 @@
     <input type="text" id="nome" placeholder="Seu nome" autofocus />
     <button onclick="confirmarPresenca()" id="btn-confirmar">Confirmar Presença</button>
     <p id="mensagem" class="mensagem"></p>
+    <div class="info-evento" id="info-evento" style="display: none;">
+      📍 <strong>Local:</strong> Salão Festas Encanto<br>
+      📅 <strong>Data:</strong> 12/05/2025<br>
+      ⏰ <strong>Horário:</strong> 16h00
+    </div>
+    <div class="link-cadastro" onclick="window.location.href='login.html'">Cadastrar convidado</div>
   </div>
 
   <script>
     const nomeInput = document.getElementById("nome");
     const mensagem = document.getElementById("mensagem");
     const btnConfirmar = document.getElementById("btn-confirmar");
+    const infoEvento = document.getElementById("info-evento");
 
     let convidados = JSON.parse(localStorage.getItem('convidados')) || {};
     let confirmados = JSON.parse(localStorage.getItem('confirmados')) || [];
@@ -78,8 +98,10 @@
         } else {
           mensagem.textContent = `Você já confirmou sua presença, ${nome}.`;
         }
+        infoEvento.style.display = 'block';
       } else {
         mensagem.textContent = "Nome não encontrado. Verifique se foi digitado corretamente.";
+        infoEvento.style.display = 'none';
       }
 
       nomeInput.value = "";
